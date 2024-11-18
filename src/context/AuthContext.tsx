@@ -1,43 +1,85 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import axios from 'axios';
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  image: string;
+}
+
 interface AuthContextProps {
-    user: any;
-    login: (username: string, password: string) => Promise<void>;
-    logout: () => void;
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  getUserFromSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-    const login = async (username: string, password: string) => {
-        const response = await axios.post<{ token: string }>('/api/auth/login', { username, password });
-        const token = response.data.token;
-        localStorage.setItem('token', token);
-        const userResponse = await axios.get('/api/user/me', {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await axios.post<{ token: string }>(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
+        { email, password }
+      );
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+
+      const userResponse = await axios.get<User>(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/me`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUser(userResponse.data);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  const getUserFromSession = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const userResponse = await axios.get<User>(
+          `${import.meta.env.VITE_API_BASE_URL}/auth/me`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setUser(userResponse.data);
-    };
+      } catch (error) {
+        console.error('Failed to fetch user from session:', error);
+        logout();
+      }
+    }
+  };
 
-    const logout = () => {
-        localStorage.removeItem('token');
-        setUser(null);
-    };
+  useEffect(() => {
+    getUserFromSession();
+  }, []);
 
-    return (
-        <AuthContext.Provider value={{ user, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider value={{ user, login, logout, getUserFromSession }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
