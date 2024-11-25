@@ -1,4 +1,4 @@
-import express, { Router, Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { productService } from './products.service';
 
 export const productRouter = Router();
@@ -32,10 +32,13 @@ productRouter.get('/', async (_req: Request, res: Response) => {
 
 productRouter.put('/:id', async (req: Request, res: Response) => {
   try {
-    await productService.updateProduct(req.params.id, req.body);
-    res.status(200).send('Product updated successfully');
+    const updatedProduct = await productService.updateProduct(req.params.id, req.body);
+    res.status(200).json({
+      message: 'Product updated successfully',
+      product: updatedProduct,
+    });
   } catch (error) {
-    res.status(500).send('Failed to update product');
+    res.status(500).json({ error: 'Failed to update product' });
   }
 });
 

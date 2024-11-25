@@ -23,8 +23,10 @@ export const productModel = {
   },
   async createProduct(product: Product) {
     const db = await dbPromise;
-    const result = await db.run('INSERT INTO products (id, name, description, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)', 
-      [product.id, product.name, product.description, product.price, product.quantity, product.image]);
+    const result = await db.run(
+      'INSERT INTO products (id, name, description, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)', 
+      [product.id, product.name, product.description, product.price, product.quantity, product.image]
+    );
     return { ...product, id: result.lastID };
   },
   async getProduct(id: string) {

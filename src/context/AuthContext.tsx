@@ -19,6 +19,7 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const login = async (email: string, password: string) => {
     try {
@@ -57,17 +58,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setUser(userResponse.data);
+        if (userResponse.status === 200 && userResponse.headers['content-type'].includes('application/json')) {
+          setUser(userResponse.data);
+        } else {
+          throw new Error('Invalid response');
+        }
       } catch (error) {
         console.error('Failed to fetch user from session:', error);
         logout();
       }
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     getUserFromSession();
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, getUserFromSession }}>

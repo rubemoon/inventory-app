@@ -9,9 +9,13 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Navbar from './components/Navbar';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Settings from './pages/Settings';
 import Signup from './pages/Signup';
 import DashboardLayout from './components/DashboardLayout';
+import Transactions from './pages/Transactions';
+import Dashboard from './pages/Dashboard';
+import ProductManagement from './pages/ProductManagement';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -21,27 +25,32 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          <Route path="/" element={<><Navbar /><Home /></>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/about" element={<><Navbar /><About /></>} />
-          <Route path="/contact" element={<><Navbar /><Contact /></>} />
-          <Route path="/dashboard/*" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Routes>
-                  <Route path="products" element={<Products />} />
-                  <Route path="suppliers" element={<Suppliers />} />
-                  <Route path="orders" element={<Orders />} />
-                  <Route path="settings" element={<Settings />} />
-                </Routes>
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-        </Routes>
-      </Router>
+      <ThemeProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<><Navbar /><Home /></>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/about" element={<><Navbar /><About /></>} />
+            <Route path="/contact" element={<><Navbar /><Contact /></>} />
+            <Route path="/dashboard/*" element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Routes>
+                    <Route path="" element={<Dashboard />} />
+                    <Route path="products" element={<Products />} />
+                    <Route path="products/:productId" element={<ProductManagement />} />
+                    <Route path="suppliers" element={<Suppliers />} />
+                    <Route path="orders" element={<Orders />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="transactions" element={<Transactions />} />
+                  </Routes>
+                </DashboardLayout>
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 };

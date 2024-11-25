@@ -1,6 +1,23 @@
-import { Product, Supplier, Order, OrderItem, Transaction, User } from '../lib/types';
+import { Order, OrderItem, Product, Supplier, Transaction, User } from "../lib/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+async function handleResponse(response: Response) {
+  const contentType = response.headers.get('Content-Type');
+  let data;
+  if (contentType && contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    data = await response.text();
+  }
+
+  if (!response.ok) {
+    const errorMessage = data.error || data || 'An unknown error occurred';
+    throw new Error(errorMessage);
+  }
+
+  return data;
+}
 
 export const apiService = {
   // Auth endpoints
@@ -12,7 +29,7 @@ export const apiService = {
       },
       body: JSON.stringify({ email, password }),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async loginUser(email: string, password: string) {
@@ -23,26 +40,24 @@ export const apiService = {
       },
       body: JSON.stringify({ email, password }),
     });
-    if (!response.ok) {
-      throw new Error('Login failed');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async getUser(id: number) {
     const response = await fetch(`${API_BASE_URL}/auth/${id}`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async getAllUsers() {
     const response = await fetch(`${API_BASE_URL}/auth`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async deleteUser(id: number) {
-    await fetch(`${API_BASE_URL}/auth/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/auth/${id}`, {
       method: 'DELETE',
     });
+    return handleResponse(response);
   },
 
   async updateUserSettings(data: User) {
@@ -53,7 +68,7 @@ export const apiService = {
       },
       body: JSON.stringify(data),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   // Product endpoints
@@ -65,17 +80,17 @@ export const apiService = {
       },
       body: JSON.stringify(product),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async getProduct(id: string) {
     const response = await fetch(`${API_BASE_URL}/products/${id}`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async getAllProducts() {
     const response = await fetch(`${API_BASE_URL}/products`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async updateProduct(id: string, product: Product) {
@@ -86,13 +101,14 @@ export const apiService = {
       },
       body: JSON.stringify(product),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async deleteProduct(id: string) {
-    await fetch(`${API_BASE_URL}/products/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/products/${id}`, {
       method: 'DELETE',
     });
+    return handleResponse(response);
   },
 
   // Supplier endpoints
@@ -104,17 +120,17 @@ export const apiService = {
       },
       body: JSON.stringify(supplier),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async getSupplier(id: string) {
     const response = await fetch(`${API_BASE_URL}/suppliers/${id}`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async getAllSuppliers() {
     const response = await fetch(`${API_BASE_URL}/suppliers`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async updateSupplier(id: string, supplier: Supplier) {
@@ -125,13 +141,14 @@ export const apiService = {
       },
       body: JSON.stringify(supplier),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async deleteSupplier(id: string) {
-    await fetch(`${API_BASE_URL}/suppliers/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/suppliers/${id}`, {
       method: 'DELETE',
     });
+    return handleResponse(response);
   },
 
   // Order endpoints
@@ -143,17 +160,17 @@ export const apiService = {
       },
       body: JSON.stringify(order),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async getOrder(id: string) {
     const response = await fetch(`${API_BASE_URL}/orders/${id}`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async getAllOrders() {
     const response = await fetch(`${API_BASE_URL}/orders`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async updateOrder(id: string, order: Order) {
@@ -164,13 +181,14 @@ export const apiService = {
       },
       body: JSON.stringify(order),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async deleteOrder(id: string) {
-    await fetch(`${API_BASE_URL}/orders/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
       method: 'DELETE',
     });
+    return handleResponse(response);
   },
 
   // Order Item endpoints
@@ -182,17 +200,22 @@ export const apiService = {
       },
       body: JSON.stringify(orderItem),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async getOrderItem(id: string) {
     const response = await fetch(`${API_BASE_URL}/order-items/${id}`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async getAllOrderItems() {
     const response = await fetch(`${API_BASE_URL}/order-items`);
-    return response.json();
+    return handleResponse(response);
+  },
+
+  async getSalesData() {
+    const response = await fetch(`${API_BASE_URL}/orders/sales-data`);
+    return handleResponse(response);
   },
 
   async updateOrderItem(id: string, orderItem: OrderItem) {
@@ -203,13 +226,14 @@ export const apiService = {
       },
       body: JSON.stringify(orderItem),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async deleteOrderItem(id: string) {
-    await fetch(`${API_BASE_URL}/order-items/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/order-items/${id}`, {
       method: 'DELETE',
     });
+    return handleResponse(response);
   },
 
   // Transaction endpoints
@@ -221,17 +245,17 @@ export const apiService = {
       },
       body: JSON.stringify(transaction),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async getTransaction(id: string) {
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async getAllTransactions() {
     const response = await fetch(`${API_BASE_URL}/transactions`);
-    return response.json();
+    return handleResponse(response);
   },
 
   async updateTransaction(id: string, transaction: Transaction) {
@@ -242,12 +266,13 @@ export const apiService = {
       },
       body: JSON.stringify(transaction),
     });
-    return response.json();
+    return handleResponse(response);
   },
 
   async deleteTransaction(id: string) {
-    await fetch(`${API_BASE_URL}/transactions/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
       method: 'DELETE',
     });
+    return handleResponse(response);
   },
 };

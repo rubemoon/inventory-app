@@ -12,31 +12,31 @@ interface DashboardLinkProps {
 const dashboardLinks: DashboardLinkProps[] = [
   {
     id: 0,
-    name: "Dashboard",
+    name: "Painel",
     href: "/dashboard",
     icon: HomeIcon,
   },
   {
     id: 1,
-    name: "Products",
+    name: "Produtos",
     href: "/dashboard/products",
     icon: Users2,
   },
   {
     id: 2,
-    name: "Suppliers",
+    name: "Fornecedores",
     href: "/dashboard/suppliers",
     icon: CalendarCheck,
   },
   {
     id: 3,
-    name: "Orders",
+    name: "Pedidos",
     href: "/dashboard/orders",
     icon: BookOpen,
   },
   {
     id: 4,
-    name: "Transactions",
+    name: "Transações",
     href: "/dashboard/transactions",
     icon: Settings,
   },

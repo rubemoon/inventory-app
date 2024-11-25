@@ -16,5 +16,8 @@ export const orderService = {
   },
   async removeOrder(id: string) {
     return orderModel.deleteOrder(id);
+  },
+  async getSalesData() {
+    return orderModel.getSalesData();
   }
 };

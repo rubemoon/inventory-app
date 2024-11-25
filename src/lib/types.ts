@@ -1,28 +1,30 @@
 export interface Product {
-    id: string;
-  
-    name: string;
-  
-    description: string;
-  
-    price: number;
-  
-    quantity: number;
-  
-    image: string;
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  image: string;
 }
 
 export interface Supplier {
   id: string;
   name: string;
-  contactInfo: string;
+  contact: string;
+  address: string;
 }
 
 export interface Order {
   id: string;
-  productId: string;
+  date: string;
+  supplierId: string;
+  status: 'Pending' | 'Completed' | 'Canceled';
+  total: number;
+  customerName: string;
+  product: string;
   quantity: number;
-  totalPrice: number;
+  userEmail: string;
+  userImage?: string;
 }
 
 export interface OrderItem {

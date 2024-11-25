@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import {
   DropdownMenu,
@@ -8,17 +7,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { useTheme } from '../context/ThemeContext';
 
 const ThemeToggle: React.FC = () => {
-  const [theme, setTheme] = useState('light');
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const root = window.document.documentElement;
     const initialTheme = root.classList.contains('dark') ? 'dark' : 'light';
     setTheme(initialTheme);
-  }, []);
+  }, [setTheme]);
 
-  const handleThemeChange = (theme: string) => {
+  const handleThemeChange = (theme: 'light' | 'dark' | 'system') => {
     setTheme(theme);
     const root = window.document.documentElement;
     if (theme === 'system') {

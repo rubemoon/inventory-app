@@ -15,16 +15,20 @@ export const orderModel = {
         id TEXT PRIMARY KEY,
         date TEXT NOT NULL,
         supplierId TEXT,
-        status TEXT CHECK(status IN ('Pending', 'Completed')),
-        total REAL CHECK(total > 0),
-        FOREIGN KEY (supplierId) REFERENCES suppliers (id)
+        status TEXT CHECK(status IN ('Pending', 'Completed', 'Canceled')),
+        total REAL CHECK(total >= 0),
+        customerName TEXT NOT NULL,
+        product TEXT NOT NULL,
+        quantity INTEGER CHECK(quantity > 0)
       );
     `);
   },
   async createOrder(order: Order) {
     const db = await dbPromise;
-    const result = await db.run('INSERT INTO orders (id, date, supplierId, status, total) VALUES (?, ?, ?, ?, ?)', 
-      [order.id, order.date, order.supplierId, order.status, order.total]);
+    const result = await db.run(
+      'INSERT INTO orders (id, date, supplierId, status, total, customerName, product, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+      [order.id, order.date, order.supplierId, order.status, order.total, order.customerName, order.product, order.quantity]
+    );
     return { ...order, id: result.lastID };
   },
   async getOrder(id: string) {
@@ -38,13 +42,26 @@ export const orderModel = {
   async updateOrder(id: string, data: Partial<Order>) {
     const db = await dbPromise;
     const result = await db.run(
-      'UPDATE orders SET date = ?, supplierId = ?, status = ?, total = ? WHERE id = ?',
-      [data.date, data.supplierId, data.status, data.total, id]
+      'UPDATE orders SET date = ?, supplierId = ?, status = ?, total = ?, customerName = ?, product = ?, quantity = ? WHERE id = ?',
+      [data.date, data.supplierId, data.status, data.total, data.customerName, data.product, data.quantity, id]
     );
     return result;
   },
   async deleteOrder(id: string) {
     const db = await dbPromise;
     return db.run('DELETE FROM orders WHERE id = ?', [id]);
+  },
+  async getSalesData() {
+    const db = await dbPromise;
+    const salesData = await db.all(`
+      SELECT 
+        strftime('%Y-%m', date) as month,
+        SUM(total) as totalSales,
+        SUM(quantity) as totalQuantity
+      FROM orders
+      GROUP BY month
+      ORDER BY month
+    `);
+    return salesData;
   }
 };

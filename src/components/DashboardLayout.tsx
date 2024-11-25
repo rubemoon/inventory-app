@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import DashboardLinks from '../components/DashboardLinks';
 import ThemeToggle from '../components/ThemeToggle';
@@ -8,20 +8,9 @@ import { Button } from '../components/ui/button';
 import { Toaster } from '../components/ui/sonner';
 import { useAuth } from '../context/AuthContext';
 
-interface DashboardLayoutProps {
-  children: ReactNode;
-}
-
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
+  const location = useLocation();
 
   return (
     <div className="min-h-screen w-full grid md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -69,7 +58,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   <Link to="/dashboard/settings">Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <button onClick={handleLogout} className="w-full text-left">Log out</button>
+                  <button onClick={logout} className="w-full text-left">Log out</button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
